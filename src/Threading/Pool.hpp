@@ -18,6 +18,11 @@ public:
     void ForceStop();
     // isBusy?
     bool busy();
+    static Threading::Pool * inst;
+    static Threading::Pool * getInst() {
+        if (inst == nullptr) inst = new Threading::Pool();
+        return inst;
+    }
 
 private:
     void ThreadLoop();
