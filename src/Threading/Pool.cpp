@@ -15,30 +15,29 @@ void Pool::Start() {
 
 void Pool::ThreadLoop() {
     while (true) {
-        std::function<void()> job;
-        {
-            std::unique_lock<std::mutex> lock(queue_mutex);
-            mutex_condition.wait(lock, [this] {
-                return !jobs.empty() || should_terminate;
-            });
-            if (should_terminate) {
-                return;
-            }
-            job = jobs.front();
-            jobs.pop();
+        Job job;
+        std::shared_ptr<void> arg;
+        std::unique_lock<std::mutex> lock(queue_mutex);
+        mutex_condition.wait(lock, [this] {
+            return !jobs.empty() || should_terminate;
+        });
+        if (should_terminate) {
+            return;
         }
-        job();
+        job = jobs.front().first;
+        arg = jobs.front().second;
+        jobs.pop();
+        job(arg);
     }
 }
 
-void Pool::QueueJob(const std::function<void()>& job) {
+void Pool::QueueJob(const Job& job, std::shared_ptr<void> args) {
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
-        jobs.push(job);
+        jobs.push({job, args});
     }
     mutex_condition.notify_one();
 }
-// threadPoolInst->QueueJob([] { /* ... */ });
 
 bool Pool::busy() {
     bool poolBusy;
