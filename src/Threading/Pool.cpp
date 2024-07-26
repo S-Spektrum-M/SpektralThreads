@@ -2,6 +2,8 @@
 using namespace Threading;
 using std::thread;
 
+Pool * Pool::inst = nullptr;
+
 void Pool::Start() {
     const auto num_threads = thread::hardware_concurrency(); // Max # of threads the system supports
     for (uint32_t ii = 0; ii < num_threads; ++ii) {
