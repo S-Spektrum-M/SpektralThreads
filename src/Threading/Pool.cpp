@@ -1,4 +1,5 @@
 #include "Pool.hpp"
+#include <iostream>
 using namespace Threading;
 using std::thread;
 
@@ -6,6 +7,7 @@ Pool * Pool::inst = nullptr;
 
 void Pool::Start() {
     const auto num_threads = thread::hardware_concurrency(); // Max # of threads the system supports
+    std::cout << num_threads << std::endl;
     for (uint32_t ii = 0; ii < num_threads; ++ii) {
         threads.emplace_back(thread(&Pool::ThreadLoop,this));
     }
