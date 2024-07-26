@@ -12,7 +12,7 @@ using Job = std::function<void(std::shared_ptr<void>)>; // return void, accept
 class Pool {
 public:
     // Start the Pool
-    void Start();
+    void Start(unsigned int num_threads=std::thread::hardware_concurrency());
     // Add a Job(std::function<void()>&) to the Job Queue
     void QueueJob(const Job& job, std::shared_ptr<void> args);
     // Wait for all threads to finish and join
