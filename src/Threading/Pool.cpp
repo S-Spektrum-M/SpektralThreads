@@ -1,14 +1,15 @@
 #include "Pool.hpp"
+#include <algorithm>
 #include <iostream>
 using namespace Threading;
 using std::thread;
 
-Pool * Pool::inst = nullptr;
+Pool *Pool::inst = nullptr;
 
 void Pool::Start(unsigned int num_threads) {
     std::cout << num_threads << std::endl;
     for (uint32_t ii = 0; ii < num_threads; ++ii) {
-        threads.emplace_back(thread(&Pool::ThreadLoop,this));
+        threads.emplace_back(thread(&Pool::ThreadLoop, this));
     }
 }
 
@@ -17,9 +18,8 @@ void Pool::ThreadLoop() {
         Job job;
         std::shared_ptr<void> arg;
         std::unique_lock<std::mutex> lock(queue_mutex);
-        mutex_condition.wait(lock, [this] {
-            return !jobs.empty() || should_terminate;
-        });
+        mutex_condition.wait(
+            lock, [this] { return !jobs.empty() || should_terminate; });
         if (should_terminate) {
             return;
         }
@@ -30,7 +30,7 @@ void Pool::ThreadLoop() {
     }
 }
 
-void Pool::QueueJob(const Job& job, std::shared_ptr<void> args) {
+void Pool::QueueJob(const Job &job, std::shared_ptr<void> args) {
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
         jobs.push({job, args});
@@ -53,10 +53,11 @@ void Pool::Stop() {
         should_terminate = true;
     }
     mutex_condition.notify_all();
-    for (thread& active_thread : threads) {
+    for (thread &active_thread : threads) {
         active_thread.join();
     }
     threads.clear();
+    started = false;
 }
 
 void Pool::ForceStop() {
@@ -65,8 +66,15 @@ void Pool::ForceStop() {
         should_terminate = true;
     }
     mutex_condition.notify_all();
-    for (thread& active_thread : threads) {
+    for (thread &active_thread : threads) {
         active_thread.join();
     }
     threads.clear();
+    started = false;
+}
+
+Pool::~Pool() {
+    ForceStop();
+    while (!jobs.empty()) {
+    }
 }
