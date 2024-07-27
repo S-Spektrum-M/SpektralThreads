@@ -7,7 +7,10 @@ using std::thread;
 Pool *Pool::inst = nullptr;
 
 void Pool::Start(unsigned int num_threads) {
+    num_threads =
+        std::max(num_threads, std::thread::hardware_concurrency() - started);
     std::cout << num_threads << std::endl;
+    started += num_threads;
     for (uint32_t ii = 0; ii < num_threads; ++ii) {
         threads.emplace_back(thread(&Pool::ThreadLoop, this));
     }
