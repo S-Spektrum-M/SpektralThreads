@@ -50,17 +50,19 @@ bool Pool::busy() {
     return poolBusy;
 }
 
-void Pool::Stop() {
+void Pool::Stop(uint8_t num_threads) {
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
         should_terminate = true;
     }
     mutex_condition.notify_all();
-    for (thread &active_thread : threads) {
-        active_thread.join();
+    for (int i = threads.size() - num_threads; i < threads.size(); i++) {
+        threads[i].join();
     }
-    threads.clear();
-    started = false;
+    for (int i = threads.size(); i < started; i++) {
+        threads[i].join();
+    }
+    started = std::max(0, started - num_threads);
 }
 
 void Pool::ForceStop() {
@@ -73,7 +75,7 @@ void Pool::ForceStop() {
         active_thread.join();
     }
     threads.clear();
-    started = false;
+    started = 0;
 }
 
 Pool::~Pool() {
