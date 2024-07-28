@@ -1,6 +1,7 @@
 #include "Pool.hpp"
 #include <algorithm>
 #include <iostream>
+#include <unistd.h>
 using namespace Threading;
 using std::thread;
 
@@ -8,7 +9,8 @@ Pool *Pool::inst = nullptr;
 
 void Pool::Start(uint8_t num_threads) {
     num_threads =
-        std::min((int)num_threads, (int)std::thread::hardware_concurrency() - this->started);
+        std::min((int)num_threads,
+                 (int)std::thread::hardware_concurrency() - this->started);
     this->started += num_threads;
     for (uint32_t ii = 0; ii < num_threads; ++ii) {
         threads.emplace_back(thread(&Pool::ThreadLoop, this));
@@ -51,21 +53,14 @@ bool Pool::busy() {
 }
 
 void Pool::Stop(uint8_t num_threads) {
-    if (num_threads > this->started) {
-         throw std::invalid_argument("Cannot stop more threads than started");
-         return;
-    }
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
         should_terminate = true;
     }
     mutex_condition.notify_all();
-    for (int i = threads.size() - num_threads; i < threads.size(); i++) {
+    for (int i = threads.size() - num_threads; i < threads.size(); i++)
         threads[i].join();
-    }
-    for (int i = threads.size(); i < this->started; i++) {
-        threads[i].join();
-    }
+    threads.erase(threads.end() - num_threads, threads.end());
     this->started = std::max(0, this->started - num_threads);
 }
 
@@ -82,6 +77,4 @@ void Pool::ForceStop() {
     this->started = 0;
 }
 
-Pool::~Pool() {
-    ForceStop();
-}
+Pool::~Pool() { ForceStop(); }
