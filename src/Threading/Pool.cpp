@@ -71,7 +71,8 @@ void Pool::ForceStop() {
     }
     mutex_condition.notify_all();
     for (thread &active_thread : threads) {
-        active_thread.join();
+        active_thread.detach();
+        delete &active_thread;
     }
     threads.clear();
     this->started = 0;
