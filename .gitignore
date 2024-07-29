@@ -1,2 +1,6 @@
-out
+# clang-format
+.clang-format
+
+# Binaries
 target/
+*.o
