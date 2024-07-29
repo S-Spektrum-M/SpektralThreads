@@ -5,6 +5,7 @@
 
 int main() {
     // Sample usage of thread pool
+    // Hello ths is a test
     auto pool = Threading::Pool::getInst();
     pool->Start(2);
     Threading::Job example = [](std::shared_ptr<void> arg){
