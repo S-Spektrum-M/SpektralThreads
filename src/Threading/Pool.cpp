@@ -10,12 +10,11 @@ Pool *Pool::inst = nullptr;
 void Pool::Start(uint8_t num_threads) {
     num_threads =
         std::min((int)num_threads,
-                 (int)std::thread::hardware_concurrency() - this->started);
+                (int)std::thread::hardware_concurrency() - this->started);
     this->started += num_threads;
-    for (uint32_t ii = 0; ii < num_threads; ++ii) {
+    for (uint8_t ii = 0; ii < num_threads; ++ii) {
         threads.emplace_back(thread(&Pool::ThreadLoop, this));
     }
-    std::cout << threads.size() << std::endl;
 }
 
 void Pool::ThreadLoop() {
@@ -24,12 +23,17 @@ void Pool::ThreadLoop() {
         std::shared_ptr<void> arg;
         std::unique_lock<std::mutex> lock(queue_mutex);
         mutex_condition.wait(
-            lock, [this] { return !jobs.empty() || should_terminate; });
+                lock, [this] { return !jobs.empty() || should_terminate; });
         if (should_terminate) {
             return;
         }
-        job = jobs.front().first;
-        arg = jobs.front().second;
+        try {
+            job = jobs.front().first;
+            arg = jobs.front().second;
+        } catch (std::exception &e) {
+            std::cout << "Error: " << e.what() << std::endl;
+            continue;
+        }
         jobs.pop();
         job(arg);
     }
@@ -58,6 +62,7 @@ void Pool::Stop(uint8_t num_threads) {
         should_terminate = true;
     }
     mutex_condition.notify_all();
+    // wait for all threads to finish
     for (int i = threads.size() - num_threads; i < threads.size(); i++)
         threads[i].join();
     threads.erase(threads.end() - num_threads, threads.end());
@@ -78,4 +83,8 @@ void Pool::ForceStop() {
     this->started = 0;
 }
 
-Pool::~Pool() { ForceStop(); }
+Pool::~Pool() {
+    // wait for all threads to finish then join then delete
+    while(busy()) {}
+    Pool::inst = nullptr;
+}
