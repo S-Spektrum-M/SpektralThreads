@@ -27,6 +27,7 @@ public:
         }
         return inst;
     }
+    std::vector<std::thread::id> getIds();
     ~Pool();
 
 private:
