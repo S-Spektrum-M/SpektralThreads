@@ -69,6 +69,14 @@ void Pool::Stop(uint8_t num_threads) {
     this->started = std::max(0, this->started - num_threads);
 }
 
+std::vector<std::thread::id> Pool::getIds() {
+    std::vector<std::thread::id> ids;
+    for (std::thread &t : threads) {
+        ids.push_back(t.get_id());
+    }
+    return ids;
+}
+
 void Pool::ForceStop() {
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
