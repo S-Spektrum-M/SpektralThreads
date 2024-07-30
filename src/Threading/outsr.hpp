@@ -7,7 +7,7 @@ namespace Threading {
         public:
             void write(const char *data, size_t len);
             void flush();
-            static outsr * getInst();
+            static outsr *getInst();
 
         private:
             static outsr *inst;
