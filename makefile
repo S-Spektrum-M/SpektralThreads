@@ -14,7 +14,7 @@ pool.o:
 	g++ -c src/Threading/Pool.cpp -std=c++20 -g -o pool.o
 
 outsr.o:
-	g++ -c src/Threading/OutSR.cpp -std=c++20 -g -o outsr.o
+	g++ -c src/Threading/outsr.cpp -std=c++20 -g -o outsr.o
 
 clean:
 	rm -f *.o *.s core target/bin/program
