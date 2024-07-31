@@ -56,7 +56,7 @@ void Pool::QueueJob(const Job &job, std::shared_ptr<void> args) {
     mutex_condition.notify_one();
 }
 
-bool Pool::busy() {
+inline bool Pool::busy() {
     bool poolBusy;
     {
         std::unique_lock<std::mutex> lock(queue_mutex);

@@ -62,7 +62,7 @@ class Pool {
      * @return bool
      * @see Threading::Pool::jobs
      */
-    bool busy();
+    inline bool busy();
     /*
      * Returns the singleton instance of the Pool class. If the instance
      * does not exist, it will create one.
