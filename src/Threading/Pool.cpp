@@ -1,6 +1,5 @@
 #include "Pool.hpp"
 #include <algorithm>
-#include <iostream>
 #include <unistd.h>
 using namespace Threading;
 using std::thread;
@@ -27,13 +26,8 @@ void Pool::ThreadLoop() {
         if (should_terminate) {
             return;
         }
-        try {
-            job = jobs.front().first;
-            arg = jobs.front().second;
-        } catch (std::exception &e) {
-            std::cout << "Error: " << e.what() << std::endl;
-            continue;
-        }
+        job = jobs.front().first;
+        arg = jobs.front().second;
         jobs.pop();
         job(arg);
     }
