@@ -20,10 +20,10 @@ int main() {
         std::cout << "Department: " << a->dept << std::endl;
         std::cout << "Professor: " << a->professor << std::endl;
     };
-    Course a = {"CS", "Turing", 101 , 2020};
-    Course b = {"PHYS", "Newton", 102 , 2021};
-    Course c = {"MATH", "Euler", 103 , 2022};
-    Course d = {"PSY", "Nietzsche", 104 , 2023};
+    Course a = {"CS", "Turing", 101, 2020};
+    Course b = {"PHYS", "Newton", 102, 2021};
+    Course c = {"MATH", "Euler", 103, 2022};
+    Course d = {"PSY", "Nietzsche", 104, 2023};
     pool->QueueJob(example, std::make_shared<Course>(a));
     pool->QueueJob(example, std::make_shared<Course>(b));
     pool->QueueJob(example, std::make_shared<Course>(c));

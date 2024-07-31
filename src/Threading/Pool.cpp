@@ -7,12 +7,27 @@ using std::thread;
 Pool *Pool::inst = nullptr;
 
 void Pool::Start(uint8_t num_threads) {
-    num_threads =
-        std::min((int)num_threads,
-                (int)std::thread::hardware_concurrency() - this->started);
-    this->started += num_threads;
-    for (uint8_t ii = 0; ii < num_threads; ++ii) {
-        threads.emplace_back(thread(&Pool::ThreadLoop, this));
+    if (this->started > 0 && this->started < thread::hardware_concurrency()) {
+        int delete_position = started;
+        threads.emplace_back(thread([&num_threads, this](){
+            num_threads =
+                std::min((int)num_threads,
+                         (int)thread::hardware_concurrency() - this->started);
+            this->started += num_threads;
+            for (uint8_t ii = 0; ii < num_threads; ++ii) {
+                threads.emplace_back(thread(&Pool::ThreadLoop, this));
+            }
+        }, this));
+        threads[delete_position].join();
+        threads.erase(threads.begin() + delete_position);
+    } else {
+        num_threads =
+            std::min((int)num_threads,
+                     (int)thread::hardware_concurrency() - this->started);
+        this->started += num_threads;
+        for (uint8_t ii = 0; ii < num_threads; ++ii) {
+            threads.emplace_back(thread(&Pool::ThreadLoop, this));
+        }
     }
 }
 
@@ -22,7 +37,7 @@ void Pool::ThreadLoop() {
         std::shared_ptr<void> arg;
         std::unique_lock<std::mutex> lock(queue_mutex);
         mutex_condition.wait(
-                lock, [this] { return !jobs.empty() || should_terminate; });
+            lock, [this] { return !jobs.empty() || should_terminate; });
         if (should_terminate) {
             return;
         }
@@ -63,9 +78,9 @@ void Pool::Stop(uint8_t num_threads) {
     this->started = std::max(0, this->started - num_threads);
 }
 
-std::vector<std::thread::id> Pool::getIds() {
-    std::vector<std::thread::id> ids;
-    for (std::thread &t : threads) {
+std::vector<thread::id> Pool::getIds() {
+    std::vector<thread::id> ids;
+    for (thread &t : threads) {
         ids.push_back(t.get_id());
     }
     return ids;
