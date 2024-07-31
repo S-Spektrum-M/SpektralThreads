@@ -1,5 +1,6 @@
 #include "Pool.hpp"
 #include <algorithm>
+#include <future>
 #include <unistd.h>
 using namespace Threading;
 using std::thread;
@@ -8,8 +9,7 @@ Pool *Pool::inst = nullptr;
 
 void Pool::Start(uint8_t num_threads) {
     if (this->started > 0 && this->started < thread::hardware_concurrency()) {
-        int delete_position = started;
-        threads.emplace_back(thread([&num_threads, this](){
+        std::future<void> handle = std::async(std::launch::async, [&num_threads, this]() {
             num_threads =
                 std::min((int)num_threads,
                          (int)thread::hardware_concurrency() - this->started);
@@ -17,9 +17,8 @@ void Pool::Start(uint8_t num_threads) {
             for (uint8_t ii = 0; ii < num_threads; ++ii) {
                 threads.emplace_back(thread(&Pool::ThreadLoop, this));
             }
-        }, this));
-        threads[delete_position].join();
-        threads.erase(threads.begin() + delete_position);
+        });
+        return handle.get();
     } else {
         num_threads =
             std::min((int)num_threads,
