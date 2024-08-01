@@ -1,4 +1,5 @@
 #include <functional>
+#include <vector>
 
 namespace Threading {
 // A cache safe queue implementation
@@ -8,7 +9,7 @@ private:
     int size;
     int max_size;
     std::function<int(int)> resize;
-    T *data;
+    std::vector<T> data;
 public:
     /* Constructor
     *

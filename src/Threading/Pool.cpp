@@ -121,8 +121,6 @@ Pool::~Pool() {
 // Threading::Queue implentations
 template <typename T>
 Queue<T>::Queue(int max_size, std::function<int(int)> resize) {
-    this->data = (T *)std::calloc(0, max_size * sizeof(T));
-    if (this->data == nullptr) throw std::bad_alloc();
     this->max_size = max_size;
     this->resize = resize;
 }
@@ -141,34 +139,12 @@ template <typename T> T Queue<T>::front() {
 
 template <typename T> T Queue<T>::pop() {
     T ret = front();
-    ++data;
-    free(data - 1);
+    data.erase(data.begin());
     return ret;
 }
 
 template <typename T> void Queue<T>::push(T val) {
-    // If the queue is full, double the size
-    if (size == max_size) {
-        max_size = resize(max_size);
-        if (data != nullptr) {
-            data = (T *)std::realloc(data, max_size * sizeof(T));
-            if (data == nullptr) throw std::bad_alloc();
-        } else {
-            data = (T *)std::malloc(max_size * sizeof(T));
-        }
-        /* T* new_data = (T*)std::malloc(max_size * sizeof(T));
-        for (int i = 0; i < max_size; ++i) {
-            new_data[i] = data[i];
-        }
-        free(data); */
-        // data = new_data;
-    }
-    try {
-        std::cout << data << std::endl;
-        data[size++] = val;
-    } catch (std::exception &e) {
-        std::cerr << e.what() << std::endl;
-    }
+    data.push_back(val);
 }
 
-template <typename T> bool Queue<T>::empty() { return !size; }
+template <typename T> bool Queue<T>::empty() { return data.empty(); }
