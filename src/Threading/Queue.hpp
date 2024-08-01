@@ -1,7 +1,7 @@
 #include <functional>
 
 namespace Threading {
-// A cahce safe queue implementation
+// A cache safe queue implementation
 template <typename T>
 class Queue {
 private:
