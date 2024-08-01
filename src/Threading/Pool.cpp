@@ -99,6 +99,12 @@ void Pool::ForceStop() {
     this->started = 0;
 }
 
+Pool::Pool() {
+    this->started = 0;
+    this->should_terminate = false;
+    jobs = Queue<std::pair<Job, std::shared_ptr<void>>>();
+}
+
 Pool::~Pool() {
     // wait for all threads to finish then join then delete
     while(busy()) {}

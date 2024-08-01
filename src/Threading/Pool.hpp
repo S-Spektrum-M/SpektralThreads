@@ -100,7 +100,7 @@ class Pool {
      * queue.
      */
     void ThreadLoop();
-    bool should_terminate = false; // Tells threads to stop looking for jobs
+    bool should_terminate; // Tells threads to stop looking for jobs
     std::mutex queue_mutex;        // Prevents data races to the job queue
     std::condition_variable
         mutex_condition; // Allows threads to wait on new jobs or termination
@@ -118,6 +118,6 @@ class Pool {
      * @see Threading::Pool::ForceStop()
      */
     std::queue<std::pair<Job, std::shared_ptr<void>>> jobs;
-    Pool() {}
+    Pool();
 };
 } // namespace Threading
