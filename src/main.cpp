@@ -13,7 +13,7 @@ struct Course {
 
 int main() {
     using namespace Threading;
-    auto pool = Pool::getInst();
+    Pool *pool = Pool::getInst();
     Threading::Job example = [](std::shared_ptr<void> arg) {
         std::shared_ptr<Course> a = std::static_pointer_cast<Course>(arg);
         std::cout << "ID: " << a->course_id << std::endl;

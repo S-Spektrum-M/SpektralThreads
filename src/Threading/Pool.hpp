@@ -4,11 +4,13 @@
 #include <queue>
 #include <thread>
 #include <vector>
+#include "Queue.hpp"
 
 namespace Threading {
-using Job = std::function<void(std::shared_ptr<void>)>; // return void, accept
+// return void, accept
 // void * to be typecast
 // in lambda body
+using Job = std::function<void(std::shared_ptr<void>)>;
 class Pool {
   public:
     /*
@@ -100,7 +102,7 @@ class Pool {
      * queue.
      */
     void ThreadLoop();
-    bool should_terminate = false; // Tells threads to stop looking for jobs
+    bool should_terminate; // Tells threads to stop looking for jobs
     std::mutex queue_mutex;        // Prevents data races to the job queue
     std::condition_variable
         mutex_condition; // Allows threads to wait on new jobs or termination
@@ -117,7 +119,8 @@ class Pool {
      * @see Threading::Pool::busy()
      * @see Threading::Pool::ForceStop()
      */
-    std::queue<std::pair<Job, std::shared_ptr<void>>> jobs;
-    Pool() {}
+    Queue<std::pair<Job, std::shared_ptr<void>>> jobs;
+    // std::queue<std::pair<Job, std::shared_ptr<void>>> jobs;
+    Pool();
 };
 } // namespace Threading

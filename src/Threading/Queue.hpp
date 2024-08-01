@@ -1,14 +1,15 @@
 #include <functional>
+#include <vector>
 
 namespace Threading {
-// A cahce safe queue implementation
+// A cache safe queue implementation
 template <typename T>
 class Queue {
 private:
     int size;
     int max_size;
     std::function<int(int)> resize;
-    T *data;
+    std::vector<T> data;
 public:
     /* Constructor
     *
