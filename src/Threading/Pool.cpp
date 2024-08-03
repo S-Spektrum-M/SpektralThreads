@@ -10,8 +10,7 @@ using std::thread;
 Pool *Pool::inst = nullptr;
 
 void Pool::Start(uint8_t num_threads) {
-    if (this->started > 0 &&
-        this->started < (int)thread::hardware_concurrency()) {
+    if (this->started > 0 && this->started < thread::hardware_concurrency()) {
         std::future<void> handle =
             std::async(std::launch::async, [&num_threads, this]() {
                 num_threads = std::min((int)num_threads,
@@ -125,8 +124,7 @@ Queue<T>::Queue(int max_size, std::function<int(int)> resize) {
     this->resize = resize;
 }
 
-template <typename T> Queue<T>::~Queue() {
-}
+template <typename T> Queue<T>::~Queue() {}
 
 template <typename T> T Queue<T>::front() {
     try {
@@ -143,8 +141,6 @@ template <typename T> T Queue<T>::pop() {
     return ret;
 }
 
-template <typename T> void Queue<T>::push(T val) {
-    data.push_back(val);
-}
+template <typename T> void Queue<T>::push(T val) { data.push_back(val); }
 
 template <typename T> bool Queue<T>::empty() { return data.empty(); }
