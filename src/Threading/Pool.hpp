@@ -1,7 +1,6 @@
 #include <condition_variable>
 #include <functional>
 #include <mutex>
-#include <queue>
 #include <thread>
 #include <vector>
 #include "Queue.hpp"
@@ -95,7 +94,7 @@ class Pool {
      * @see Threading::Pool::Start()
      * @see Threading::Pool::Stop()
      */
-    int started;
+    uint8_t started;
     /*
      * The function that each thread will run. This function will wait for a
      * condition variable to be notified, then execute the next job in the
