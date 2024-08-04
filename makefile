@@ -2,7 +2,7 @@ run: target/bin/program
 	./target/bin/program
 
 debug: main.o pool.o
-	g++ main.o pool.o -o target/bin/program -std=c++20 -S
+	g++ main.o pool.o -o target/bin/program -std=c++20
 
 all: main.o pool.o outsr.o instr.o
 	g++ main.o pool.o outsr.o -o target/bin/program -std=c++20
