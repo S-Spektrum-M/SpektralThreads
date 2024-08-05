@@ -35,16 +35,14 @@ void Pool::Start(uint8_t num_threads) {
 
 void Pool::ThreadLoop() {
     while (true) {
-        Job job;
-        std::shared_ptr<void> arg;
         std::unique_lock<std::mutex> lock(queue_mutex);
         mutex_condition.wait(
             lock, [this] { return !jobs.empty() || should_terminate; });
         if (should_terminate) {
             return;
         }
-        job = jobs.front().first;
-        arg = jobs.front().second;
+        Job job = jobs.front().first;
+        std::shared_ptr<void> arg = jobs.front().second;
         jobs.pop();
         job(arg);
     }
