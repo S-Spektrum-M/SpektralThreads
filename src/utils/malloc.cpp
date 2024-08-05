@@ -1,3 +1,4 @@
+// Inspired by github.com/redis/redis/src/zmalloc.c
 #include "malloc.hpp"
 #include <cstdlib>
 #include <cstring>
@@ -10,7 +11,7 @@ struct {
     size_t used_memory = 0;
 } tracker;
 
-// Simple wrapper for std::async.
+// Detaching thread runner
 auto detr(auto fn) { std::thread(fn).detach(); }
 
 void *zmalloc(size_t size) {
@@ -30,11 +31,11 @@ void *zrealloc(void *ptr, size_t size) {
 }
 
 void zfree(void *ptr) {
+    free(ptr);
     detr([ptr]() {
         tracker.used_memory -= tracker.memory_map[ptr];
         tracker.memory_map.erase(ptr);
     });
-    free(ptr);
 }
 
 size_t used_memory(void) { return tracker.used_memory; }
