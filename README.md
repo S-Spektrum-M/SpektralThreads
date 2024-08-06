@@ -1,5 +1,7 @@
 # Spektral Threads - The Fastest CUDA Threading Utility
 
+**THIS PROJECT IS CURRENTLY UNFINISHED**
+
 ## Introduction
 
 Spektral Threads is a light-weight utility for assigning jobs to threads with a
